@@ -40,3 +40,6 @@ Route::get('/email', function(){
     Mail::to('jorgefloriano1646@gmail.com')->send(new EmailTest($name));
     echo 'Email enviado!';
 });
+
+Route::get('/edit/{id_user}', 'Main@edit')->name('main_edit');
+Route::get('/final/{hash}', 'Main@final')->name('main_final');

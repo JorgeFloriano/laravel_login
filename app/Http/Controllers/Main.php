@@ -4,20 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Classes\OurClass;
 use App\Classes\Random;
+use App\Classes\Enc;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class Main extends Controller
 {
 
     /*instantiation of the random class in the constructor to make it easier to use later */
     private $R;
+    private $Enc;
 
     public function __construct()
     {
         $this->R = new Random;
+        $this->Enc = new Enc;
     }
     //---------------------------------------
     public function index()
@@ -103,14 +107,18 @@ class Main extends Controller
             return redirect()->route('login');
         }
 
-        // create session (if login ok)
+        // login is valid
         session()->put('user', $user);
+
+        Log::channel('main')->info('There was a login.');
+
         return redirect()->route('index');
     }
 
     //----------------------------------------
     public function logout()
     {
+        Log::channel('main')->info('There was a logout.');
         session()->forget('user');
         return redirect()->route('index');
     }
@@ -127,9 +135,27 @@ class Main extends Controller
         // random class was instantiated in the constructor so it can be used within main at any time in a practical way
 
         $data = [
-            'smstoken' => $this->R->SMSToken()
+            'smstoken' => $this->R->SMSToken(),
+            'users' => User::all()
         ];
 
         return view('home', $data);
+    }
+
+    //----------------------------------------
+    public function edit($id_user)
+    {
+        $id_user = $this->Enc->decrypt($id_user);
+
+
+
+        echo "vou editar os dados do user $id_user";
+    }
+
+    //----------------------------------------
+    public function final($hash)
+    {
+        $hash = $this->Enc->decrypt($hash);
+        echo 'value:'.$hash;
     }
 }
