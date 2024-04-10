@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\OurClass;
 use App\Classes\Random;
 use App\Classes\Enc;
+use App\Classes\Logger;
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,11 +18,13 @@ class Main extends Controller
     /*instantiation of the random class in the constructor to make it easier to use later */
     private $R;
     private $Enc;
+    private $Logger;
 
     public function __construct()
     {
-        $this->R = new Random;
-        $this->Enc = new Enc;
+        $this->R = new Random();
+        $this->Enc = new Enc();
+        $this->Logger = new Logger();
     }
     //---------------------------------------
     public function index()
@@ -97,12 +100,20 @@ class Main extends Controller
 
         // check if user exists
         if (!$user) {
+
+            // logger
+            $this->Logger->log('error', trim($request->input('txt_user')) . '- user not exists');
+
             session()->flash('erro', 'Invalid login.');
             return redirect()->route('login');
         }
 
         // check if the password is ok
         if (!Hash::check($pass, $user->pass)) {
+
+            // logger
+            $this->Logger->log('error', trim($request->input('txt_user')) . '- invalid password');
+
             session()->flash('erro', 'Invalid login!');
             return redirect()->route('login');
         }
@@ -110,7 +121,10 @@ class Main extends Controller
         // login is valid
         session()->put('user', $user);
 
-        Log::channel('main')->info('There was a login.');
+        // logger
+        $this->Logger->log('info', 'is logged in');
+
+        //Log::channel('main')->info('There was a login.');
 
         return redirect()->route('index');
     }
@@ -118,8 +132,12 @@ class Main extends Controller
     //----------------------------------------
     public function logout()
     {
-        Log::channel('main')->info('There was a logout.');
+        // logger
+        $this->Logger->log('info', 'is logged out');
+
+        //Log::channel('main')->info('There was a logout.');
         session()->forget('user');
+
         return redirect()->route('index');
     }
 
@@ -156,6 +174,17 @@ class Main extends Controller
     public function final($hash)
     {
         $hash = $this->Enc->decrypt($hash);
-        echo 'value:'.$hash;
+        echo 'value:' . $hash;
+    }
+
+    //----------------------------------------
+    public function upload(Request $request)
+    {
+
+        // $request->txtFile->storeAs('public/images', 'new.jpg');
+
+        $request->txtFile->store('public/images');
+
+        echo 'finsh';
     }
 }

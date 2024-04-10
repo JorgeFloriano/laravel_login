@@ -43,3 +43,6 @@ Route::get('/email', function(){
 
 Route::get('/edit/{id_user}', 'Main@edit')->name('main_edit');
 Route::get('/final/{hash}', 'Main@final')->name('main_final');
+
+// File upload
+Route::post('/upload', 'Main@upload')->name('main_upload');
