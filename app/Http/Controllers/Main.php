@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class Main extends Controller
 {
@@ -180,11 +181,45 @@ class Main extends Controller
     //----------------------------------------
     public function upload(Request $request)
     {
+        // upload validate
+        $validate = $request->validate(
+
+            // rules
+            [
+                'txtFile' => 'required|image|mimes:jpeg|max:12|
+                dimensions:
+                max_width=100,
+                max_height=200'
+            ],
+            // errors messages
+            [
+                'txtFile.required' => 'Image is required',
+                'txtFile.image' => 'It has to be an image',
+                'txtFile.mimes' => 'It has to be an jpeg image',
+                'txtFile.max' => 'The image must be a maximum of 12 kb',
+                'txtFile.dimensions' => 'Valid dimensions (200x100 max)',
+            ]
+        );
 
         // $request->txtFile->storeAs('public/images', 'new.jpg');
 
         $request->txtFile->store('public/images');
 
         echo 'finsh';
+    }
+
+    //----------------------------------------
+    public function file_list()
+    {
+        $files = Storage::files('public/pdfs');
+
+        echo '<pre>';
+        print_r($files);
+    }
+
+    //----------------------------------------
+    public function download($file)
+    {
+        return response()->download("storage/pdfs/$file");
     }
 }

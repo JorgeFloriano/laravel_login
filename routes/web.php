@@ -46,3 +46,7 @@ Route::get('/final/{hash}', 'Main@final')->name('main_final');
 
 // File upload
 Route::post('/upload', 'Main@upload')->name('main_upload');
+
+Route::get('/file_list', 'Main@file_list')->name('file_list');
+
+Route::get('/download/{file}', 'Main@download')->name('download');
