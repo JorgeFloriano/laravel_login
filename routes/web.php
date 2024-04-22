@@ -24,7 +24,6 @@ Route::post('/login_submit', 'Main@login_submit')->name('login_submit');
 //Route::get('/temp', 'Main@temp')->name('temp');
 
 Route::get('/home', 'Main@home')->name('home');
-
 Route::get('/logout', 'Main@logout')->name('logout');
 
 Route::get('/const', function(){
@@ -41,7 +40,14 @@ Route::get('/email', function(){
     echo 'Email enviado!';
 });
 
-Route::get('/edit/{id_user}', 'Main@edit')->name('main_edit');
+// Middleware example
+Route::get('/edit/{id_user}', 'Main@edit')->middleware('checksession')->name('main_edit');
+
+// Route::middleware('checksession')->group(function(){
+//     Route::get('/home', 'Main@home')->name('home');
+//     Route::get('/logout', 'Main@logout')->name('logout');
+// });
+
 Route::get('/final/{hash}', 'Main@final')->name('main_final');
 
 // File upload
